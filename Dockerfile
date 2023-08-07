@@ -1,11 +1,18 @@
-# Use the official OpenJDK image as the base image
-FROM openjdk:20-jdk
-
-# Set the working directory in the container
+# Stage 1: Build the application
+FROM gradle:latest AS build
 WORKDIR /app
 
-# Copy the application JAR file into the container
-COPY build/libs/finance-0.0.1-SNAPSHOT.jar app.jar
+# Copy Gradle files and build the project
+COPY build.gradle settings.gradle ./
+COPY src/ src/
+RUN gradle build --no-daemon
+
+# Stage 2: Create a minimal runtime image
+FROM openjdk:20-jdk
+WORKDIR /app
+
+# Copy the JAR from the build stage
+COPY --from=build /app/build/libs/finance-0.0.1-SNAPSHOT.jar app.jar
 
 # Expose the port your Spring Boot application is running on
 EXPOSE 8080
