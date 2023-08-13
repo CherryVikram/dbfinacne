@@ -3,6 +3,7 @@ package com.cherry.finance.controller;
 import com.cherry.finance.model.User;
 import com.cherry.finance.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,36 +16,38 @@ import java.util.UUID;
 @RequestMapping("/users")
 @CrossOrigin
 public class UserController {
+    HttpHeaders headers = new HttpHeaders();
 
     private final UserService userService;
 
     @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
+        headers.set("Allow-Control-Allow-Origin", "*");
     }
 
     @GetMapping("/healthCheck")
     public ResponseEntity<String> healthCheck() {
-        return new ResponseEntity<>("Server up and running", HttpStatus.OK);
+        return new ResponseEntity<>("Server up and running", headers, HttpStatus.OK);
     }
 
     @GetMapping
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+    public ResponseEntity<List<User>> getAllUsers() {
+        return new ResponseEntity<>(userService.getAllUsers(), headers, HttpStatus.OK);
     }
 
     @GetMapping("/enabled")
-    public List<User> getAllEnabledUsers() {
-        return userService.getAllEnabledUsers();
+    public ResponseEntity<List<User>> getAllEnabledUsers() {
+        return new ResponseEntity<>(userService.getAllEnabledUsers(), headers, HttpStatus.OK);
     }
 
     @GetMapping("/{userId}")
-    public User getUserByUserId(@PathVariable UUID userId) {
-        return userService.getUserByUserId(userId);
+    public ResponseEntity<User> getUserByUserId(@PathVariable UUID userId) {
+        return new ResponseEntity<>(userService.getUserByUserId(userId), headers, HttpStatus.OK);
     }
 
     @PostMapping
-    public User createUser(@RequestBody User user) {
-        return userService.createUser(user);
+    public ResponseEntity<User> createUser(@RequestBody User user) {
+        return new ResponseEntity<>(userService.createUser(user), headers, HttpStatus.CREATED);
     }
 }
