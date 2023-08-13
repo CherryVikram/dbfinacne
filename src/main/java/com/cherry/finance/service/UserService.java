@@ -6,6 +6,7 @@ import com.cherry.finance.model.User;
 import com.cherry.finance.repository.TransactionRepository;
 import com.cherry.finance.repository.UserRepository;
 import com.cherry.finance.settings.Constants;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.format.datetime.DateFormatter;
@@ -66,5 +67,14 @@ public class UserService {
         transaction.setAmountPaid(0);
         transaction.setBalance(user.getBalance());
         transactionRepository.save(transaction);
+    }
+
+    @Transactional
+    public void deleteUserAndTransactions(UUID userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user != null) {
+            transactionRepository.deleteByUser(user);
+            userRepository.delete(user);
+        }
     }
 }

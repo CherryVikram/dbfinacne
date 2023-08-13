@@ -50,4 +50,10 @@ public class UserController {
     public ResponseEntity<User> createUser(@RequestBody User user) {
         return new ResponseEntity<>(userService.createUser(user), headers, HttpStatus.CREATED);
     }
+
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<String> deleteUserAndTransactions(@PathVariable UUID userId) {
+        userService.deleteUserAndTransactions(userId);
+        return ResponseEntity.ok("User and associated transactions deleted successfully.");
+    }
 }
