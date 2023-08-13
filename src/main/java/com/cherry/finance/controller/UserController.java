@@ -23,7 +23,7 @@ public class UserController {
     @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
-        headers.set("Allow-Control-Allow-Origin", "*");
+        headers.set("Allow-Origin", "*");
     }
 
     @GetMapping("/healthCheck")

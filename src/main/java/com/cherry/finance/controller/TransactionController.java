@@ -22,7 +22,7 @@ public class TransactionController {
     @PostMapping
     public ResponseEntity<Transaction> createTransaction(@RequestBody Transaction transaction) {
         HttpHeaders  headers = new HttpHeaders();
-        headers.set("Allow-Control-Allow-Origin", "*");
+        headers.set("Allow-Origin", "*");
         return new ResponseEntity<>(transactionService.createTransaction(transaction), headers, HttpStatus.CREATED);
     }
 }
