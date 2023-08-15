@@ -17,6 +17,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
+import static com.cherry.finance.helper.DateFormatHelper.DATE_TIME_FORMATTER;
+
 @Service
 public class UserService {
     private final UserRepository userRepository;
@@ -49,11 +51,11 @@ public class UserService {
 
     private User setUser(User user) {
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
-        LocalDateTime currentDate = LocalDateTime.now().plusDays(1);
-        LocalDateTime endDate = currentDate.plusDays(Constants.NUM_OF_DAYS);
+        DateTimeFormatter formatter = DATE_TIME_FORMATTER;
+        LocalDateTime nextDate = LocalDateTime.parse(user.getStartDate(), formatter).plusDays(1);
+        LocalDateTime endDate = nextDate.plusDays(Constants.NUM_OF_DAYS);
         float interest = user.getBalance() * Constants.INTEREST_RATE;
-        user.setStartDate(currentDate.format(formatter));
+        user.setStartDate(nextDate.format(formatter));
         user.setEndDate(endDate.format(formatter));
         user.setInterest(interest);
         return user;
@@ -61,8 +63,9 @@ public class UserService {
 
     private void createInitialTransaction(User user) {
         Transaction transaction = new Transaction();
+        LocalDateTime currentDate = LocalDateTime.parse(user.getStartDate(), DATE_TIME_FORMATTER).minusDays(1);
         transaction.setUser(user);
-        transaction.setTransactionDate(LocalDateTime.now().format(DateFormatHelper.DATE_TIME_FORMATTER));
+        transaction.setTransactionDate(currentDate.format(DATE_TIME_FORMATTER));
         transaction.setComment("Initial loan amount paid " + user.getBalance());
         transaction.setAmountPaid(0);
         transaction.setBalance(user.getBalance());

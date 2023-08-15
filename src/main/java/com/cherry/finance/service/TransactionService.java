@@ -1,5 +1,6 @@
 package com.cherry.finance.service;
 
+import com.cherry.finance.dto.TransactionResponseDTO;
 import com.cherry.finance.helper.DateFormatHelper;
 import com.cherry.finance.model.Transaction;
 import com.cherry.finance.model.User;
@@ -10,6 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -42,6 +47,38 @@ public class TransactionService {
         transaction.setUser(user);
         transaction.setComment(userComment);
         return transactionRepository.save(transaction);
+    }
+
+    public List<Transaction> getTransactionsByUserId(UUID userId) {
+        return transactionRepository.findByUserUserId(userId);
+    }
+
+    public List<TransactionResponseDTO> getTransactionDTOsByUserId(UUID userId) {
+        List<Transaction> transactions = transactionRepository.findByUserUserId(userId);
+
+        // Map transactions to TransactionResponseDTO
+        return transactions.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    // Helper method to map Transaction to TransactionResponseDTO
+    private TransactionResponseDTO mapToDTO(Transaction transaction) {
+        return new TransactionResponseDTO(
+                transaction.getTransactionId(),
+                transaction.getTransactionDate(),
+                transaction.getComment(),
+                transaction.getAmountPaid(),
+                transaction.getBalance()
+        );
+    }
+
+    public Optional<Transaction> getTransactionById(UUID transactionId) {
+        return transactionRepository.findById(transactionId);
+    }
+
+    public void deleteTransactionById(UUID transactionId) {
+        transactionRepository.deleteById(transactionId);
     }
 }
 
